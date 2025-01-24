@@ -10,25 +10,25 @@ import java.util.List;
 @Service
 public class TodoService {
 
-    @Autowired
-    private TodoRepository todoRepository;
+    private final TodoRepository todoRepository;
 
-    public List<TodoTask> queryTasks(@RequestParam(required = false) String priority,
-                                     @RequestParam(required = false)Boolean doneStatus,
-                                     @RequestParam(required = false)String name){
-
-        return todoRepository.queryTasks(priority, doneStatus, name);
+    public TodoService (TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
 
     }
 
+    public List<TodoTask> getTasks(String priority, Boolean doneStatus, String name /*int page*/){
+        return todoRepository.getAllTodos();
+
+    }
     public void createTodoTask(String description, String priority, Date dueDate, Boolean isDone){
         TodoTask newTodo = new TodoTask(description, priority, dueDate, isDone);
-        todoRepository.createTodoTask(newTodo);
+        todoRepository.createTodo(newTodo);
 
     }
 
     public void updateTodoTaskStatus(String id, Boolean isDone){
-        todoRepository.updateTodoTaskStatus(id, isDone);
+        todoRepository.updateTodo(id, isDone);
 
     }
 

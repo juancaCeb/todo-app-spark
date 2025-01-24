@@ -11,14 +11,21 @@ import java.util.List;
 
 public class TodoTaskcontroller {
 
-    @Autowired
-    private TodoService todoService;
+    private final TodoService todoService;
+
+    public TodoTaskcontroller(TodoService todoService){
+        this.todoService = todoService;
+
+    }
 
     @GetMapping("/todos")
     public List<TodoTask> getTodoTasks(@RequestParam(required = false) String priority,
                                        @RequestParam(required = false)Boolean doneStatus,
-                                       @RequestParam(required = false)String name){
-        return todoService.queryTasks(priority, doneStatus, name);
+                                       @RequestParam(required = false)String name
+                                     //   ,@RequestParam(required = true)int page
+                                        )
+    {
+        return todoService.getTasks(priority, doneStatus, name);
 
     }
 
@@ -30,7 +37,6 @@ public class TodoTaskcontroller {
 
     @PutMapping("/todos/{id}")
     public void changeTodoTaskStatus(@PathVariable String id, Boolean isDone){
-
         todoService.updateTodoTaskStatus(id, isDone);
 
     }
