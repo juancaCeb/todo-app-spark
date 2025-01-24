@@ -28,6 +28,13 @@ public class TodoTaskcontroller {
 
     }
 
+    @PutMapping("/todos/{id}")
+    public void changeTodoTaskStatus(@PathVariable String id, Boolean isDone){
+
+        todoService.updateTodoTaskStatus(id, isDone);
+
+    }
+
 
 
 

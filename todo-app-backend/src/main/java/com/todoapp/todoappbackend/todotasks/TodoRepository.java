@@ -18,7 +18,7 @@ public class TodoRepository {
                                      @RequestParam(required = false) Boolean doneStatus,
                                      @RequestParam(required = false) String name) {
         return todos.stream()
-                .filter(todo -> priority == null || todo.getPriority().equals(priority))
+                .filter(todo -> priority == null || priority.equalsIgnoreCase("All") || todo.getPriority().equals(priority))
                 .filter(todo -> doneStatus == null ||
                         todo.getDoneStatus().equals(doneStatus))
                 .filter(todo -> name == null || name.isEmpty() ||
@@ -29,4 +29,18 @@ public class TodoRepository {
     public void createTodoTask(TodoTask newTodoTask) {
         todos.add(newTodoTask);
     }
+
+    public void updateTodoTaskStatus(String id, Boolean isDone){
+        TodoTask taskToUpdate = todos.stream()
+                .filter(todo -> todo.getId().contains(id))
+                .findFirst()
+                .orElse(null);
+
+        if (taskToUpdate != null) {
+            taskToUpdate.setDoneStatus(isDone);
+        } else {
+            throw new IllegalArgumentException("Todo task with ID " + id + " not found.");
+        }
+    }
+
 }

@@ -27,4 +27,9 @@ public class TodoService {
 
     }
 
+    public void updateTodoTaskStatus(String id, Boolean isDone){
+        todoRepository.updateTodoTaskStatus(id, isDone);
+
+    }
+
 }

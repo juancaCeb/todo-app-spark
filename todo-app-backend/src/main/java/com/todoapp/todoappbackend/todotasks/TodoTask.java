@@ -58,7 +58,7 @@ public class TodoTask {
     }
 
 
-    public void setIsDone(Boolean isDone) {
+    public void setDoneStatus(Boolean isDone) {
         this.isDone = isDone;
     }
 
