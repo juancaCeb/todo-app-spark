@@ -11,17 +11,11 @@ interface todo{
 
 }
 
-function TodoTable() {
-  
-  const BASE_URL = "http://localhost:9090/todos";
+interface TodoTableProps {
+  todos: todo[];
+}
 
-  const [data, setData] = useState<todo[]>([]); 
-
-  useEffect(() => {
-    fetch(BASE_URL)
-      .then((response) => response.json())
-      .then((data: todo[]) => setData(data));
-  }, []);
+function TodoTable({ todos }: TodoTableProps) {
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
@@ -47,7 +41,7 @@ function TodoTable() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {data.map((todo) => (
+            {todos.map((todo) => (
               <tr key={todo.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <input
