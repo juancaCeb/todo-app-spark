@@ -1,6 +1,7 @@
 package com.todoapp.todoappbackend.todotasks;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -30,9 +31,8 @@ public class TodoTaskcontroller {
     }
 
     @PostMapping("/todos")
-    public void createTodoTask(String description, String priority,Date dueDate, Boolean isDone){
-        todoService.createTodoTask(description, priority, dueDate, isDone);
-
+    public void createTodoTask(@RequestBody TodoTask todo) {
+        todoService.createTodoTask(todo.getDescription(), todo.getPriority(), todo.getDueDate(), todo.getDoneStatus());
     }
 
     @PutMapping("/todos/{id}")
