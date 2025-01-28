@@ -18,7 +18,6 @@ function SearchTask({ todos, filterFunc }: SearchTaskProps) {
   const [priority, setPriority] = useState<string>('All');
   const [status, setStatus] = useState<string>('All');
 
-  // Handler for the Search button click
   const handleSearch = () => {
     filterFunc(name, priority, status, todos);
   };
@@ -54,7 +53,7 @@ function SearchTask({ todos, filterFunc }: SearchTaskProps) {
         <div>
           <select
             value={status}
-            onChange={(e) => setStatus(e.target.value)}  // Add onChange to update status state
+            onChange={(e) => setStatus(e.target.value)} 
             className="w-full p-2 border rounded-md"
           >
             <option value="All">All</option>
