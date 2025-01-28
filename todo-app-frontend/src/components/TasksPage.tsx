@@ -26,7 +26,7 @@ function TasksPage(){
             .then((response) => response.json())
             .then((data: todo[]) => {
                 setTodos(data);
-                setFilteredTodos(data);  // Initially set filteredTodos to all todos
+                setFilteredTodos(data);  
             });
     }, []);
 
