@@ -15,15 +15,15 @@ export default function CreateTodo() {
   }
 
   return (
-    <>
+    <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <button
         onClick={toggleModal}
-        className="px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
+        className="w-full px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
       >
         + New To Do
       </button>
 
       {modal && <CreateToDoPopup toggleModal={toggleModal} />}
-    </>
+    </div>
   );
 }

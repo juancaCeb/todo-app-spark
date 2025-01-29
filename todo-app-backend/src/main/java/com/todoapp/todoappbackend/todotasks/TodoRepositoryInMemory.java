@@ -21,7 +21,7 @@ public class TodoRepositoryInMemory implements TodoRepository{
                 .filter(todo -> doneStatus == null ||
                         todo.getDoneStatus().equals(doneStatus))
                 .filter(todo -> name == null || name.isEmpty() ||
-                        todo.getDescription().toLowerCase().contains(name.toLowerCase()))
+                        todo.getName().toLowerCase().contains(name.toLowerCase()))
                 .collect(Collectors.toList());
     }
 

@@ -1,6 +1,13 @@
 import React from 'react';
 
-const Pagination: React.FC = () => {
+interface PaginationProps {
+  currPage: number;
+  setCurrPage: (page:number) => void;
+}
+
+
+
+function Pagination ({ currPage, setCurrPage }: PaginationProps) {
   return (
     <div className="flex justify-center items-center space-x-2 mt-4">
       <button

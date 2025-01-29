@@ -1,65 +1,49 @@
 import { useEffect, useState } from "react";
 import SearchTask from "./SearchTask";
 import TodoTable from "./TodoTable";
+import CreateTodo from "./CreateTodo";
+import Pagination from "./Pagination";
 
+function TasksPage() {
+  interface todo {
+    id: number;
+    name: string;
+    priority: string;
+    dueDate: string;
+    doneStatus: string;
+  }
 
-function TasksPage(){
+  const [todos, setTodos] = useState<todo[]>([]);
+  const [currPage, setCurrPage] = useState(1);
 
-    interface todo{
+  const BASE_URL = "http://localhost:9090/todos";
 
-        id:number;
-        description:string;
-        priority:string;
-        dueDate: string;
-        doneStatus: boolean;
-      
-    }
-    
-    const [ todos, setTodos ] = useState<todo[]>([]);
-    const [filteredTodos, setFilteredTodos] = useState<todo[]>([]); 
+  const applyFilter = (name: string, priority: string, status: string) => {
 
-    
-    const BASE_URL = "http://localhost:9090/todos";
+    const url = `${BASE_URL}?priority=${priority}&page=${currPage}&name=${name}&doneStatus=${status}`;
 
-    useEffect(() => {
-        fetch(BASE_URL)
-            .then((response) => response.json())
-            .then((data: todo[]) => {
-                setTodos(data);
-                setFilteredTodos(data);  
-            });
-    }, []);
+    fetch(url)
+      .then((response) => response.json())
+      .then((data: todo[]) => {
+        setTodos(data);
+      });
+  };
 
-    const applyFilter = (name:string, priority:string, status:string, _todos: todo[]) => {
+  useEffect(() => {
 
-        let filteredTodos = todos;
+    applyFilter("", "All", "All");
 
-        if (name) {
-          filteredTodos = filteredTodos.filter((todo) =>
-            todo.description.toLowerCase().includes(name.toLowerCase())
-          );
-        }
-    
-        if (priority !== "All") {
-          filteredTodos = filteredTodos.filter((todo) => todo.priority === priority);
-        }
-    
-        if (status !== "All") {
-          const isDone = status === "Done";
-          filteredTodos = filteredTodos.filter((todo) => todo.doneStatus === isDone);
-        }
-    
-        setFilteredTodos(filteredTodos);
+  }, []); 
 
-    }
-
- return (
+  return (
     <div>
-       <SearchTask todos={todos} filterFunc={applyFilter}/>
-        <TodoTable todos={filteredTodos}/>
+      <SearchTask filterFunc={applyFilter} />
+      <CreateTodo />
+      <TodoTable todos={todos} />
+      <Pagination currPage={currPage} setCurrPage={setCurrPage} />
     </div>
   );
 
-};
+}
 
 export default TasksPage;

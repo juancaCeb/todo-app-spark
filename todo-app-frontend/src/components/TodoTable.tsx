@@ -1,14 +1,12 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 
-interface todo{
-
-  id:number;
-  description:string;
-  priority:string;
+interface todo {
+  id: number;
+  name: string;
+  priority: string;
   dueDate: string;
-  doneStatus: boolean;
-
+  doneStatus: string; 
 }
 
 interface TodoTableProps {
@@ -16,6 +14,9 @@ interface TodoTableProps {
 }
 
 function TodoTable({ todos }: TodoTableProps) {
+
+  const convertToBoolean = (status: string) => status === 'true';
+  console.log(todos);
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
@@ -27,7 +28,7 @@ function TodoTable({ todos }: TodoTableProps) {
                 Done
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Description
+                Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Priority
@@ -46,13 +47,14 @@ function TodoTable({ todos }: TodoTableProps) {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <input
                     type="checkbox"
-                    checked={todo.doneStatus}
+                    checked={convertToBoolean(todo.doneStatus)}
                     className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    onChange={() => {}}
                   />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="text-gray-900">
-                    {todo.description}
+                    {todo.name}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

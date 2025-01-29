@@ -9,15 +9,16 @@ public class TodoTask {
     private final String id = UUID.randomUUID().toString();
     private String priority;
     private LocalDateTime creationDate;
-    private Date dueDate;
-    private String description;
+    private LocalDateTime dueDate;
+    private String name;
     private Boolean isDone;
+    private LocalDateTime doneDate;
 
-    public TodoTask(String description, String priority, Date dueDate, Boolean isDone){
+    public TodoTask(String name, String priority, LocalDateTime dueDate, Boolean isDone){
         this.priority = priority;
         this.dueDate = dueDate;
         this.isDone = isDone;
-        this.description = description;
+        this.name = name;
         this.creationDate = LocalDateTime.now();
     }
 
@@ -41,20 +42,20 @@ public class TodoTask {
         this.creationDate = creationDate;
     }
 
-    public Date getDueDate() {
+    public LocalDateTime getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(Date dueDate) {
+    public void setDueDate(LocalDateTime dueDate) {
         this.dueDate = dueDate;
     }
 
-    public String getDescription() {
-        return description;
+    public String getName() {
+        return name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setName(String description) {
+        this.name = description;
     }
 
 
@@ -64,6 +65,14 @@ public class TodoTask {
 
     public Boolean getDoneStatus() {
         return this.isDone;
+    }
+
+    public void setDoneDate(LocalDateTime date){
+        this.doneDate = date;
+    }
+
+    public LocalDateTime getDoneDate(){
+        return this.doneDate;
     }
 
 }
