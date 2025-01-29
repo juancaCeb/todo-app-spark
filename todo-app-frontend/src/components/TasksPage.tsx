@@ -27,6 +27,7 @@ function TasksPage() {
     setName(name);
     setPriority(priority);
     setStatus(status);
+    setCurrPage(1);
   };
 
   const performFetch = () => {
@@ -58,7 +59,7 @@ function TasksPage() {
     <div>
       <SearchTask filterFunc={applyFilter} />
       <CreateTodo performFetch={performFetch} />
-      <TodoTable todos={todos} />
+      <TodoTable todos={todos} performFetch={performFetch} />
       <Pagination currPage={currPage} setCurrPage={setCurrPage} totalPages={numOfTotalPages} />
     </div>
   );
