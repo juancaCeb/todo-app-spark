@@ -21,7 +21,7 @@ public class TodoTaskcontroller {
 
     }
 
-    @CrossOrigin(origins = "http://localhost:3000", exposedHeaders = "tasks-count")
+    @CrossOrigin(origins = "http://localhost:8080", exposedHeaders = "tasks-count")
     @GetMapping("/todos")
     public ResponseEntity<List<TodoTask>> getTodoTasks(@RequestParam(required = false) String priority,
                                                       @RequestParam(required = false) String doneStatus,
@@ -44,9 +44,15 @@ public class TodoTaskcontroller {
         todoService.createTodoTask(todo.getName(), todo.getPriority(), todo.getDueDate());
     }
 
-    @PutMapping("/todos/{id}")
+    @PutMapping("/todos/{id}/doneStatus")
     public void changeTodoTaskStatus(@PathVariable String id){
         todoService.updateTodoTaskStatus(id);
+
+    }
+
+    @PutMapping("/todos/{id}")
+    public void editTask(@PathVariable String id, @RequestBody TodoTask todo){
+        todoService.editTodoTask(id, todo);
 
     }
 

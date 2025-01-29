@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,6 +52,16 @@ public class TodoService {
     public int getTodoListCount(){
 
         return todoRepository.getAllTodos().size();
+
+    }
+
+    public void editTodoTask(String id, TodoTask newTodo){
+
+        TodoTask oldTodoTask = todoRepository.searchTodoTaskById(id);
+
+        oldTodoTask.setName(newTodo.getName());
+        oldTodoTask.setDueDate(newTodo.getDueDate());
+        oldTodoTask.setPriority(newTodo.getPriority());
 
     }
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import dayjs from 'dayjs';
 
 interface Todo {
   id: string;
@@ -10,15 +11,17 @@ interface Todo {
 
 interface TodoTableProps {
   todos: Todo[];
+  performFetch: () => void;
 }
 
-const TodoTable = ({ todos }: TodoTableProps) => {
-  const [editingTodo, setEditingTodo] = useState<string | null>(null);  // Track the id of the todo being edited
-  const [editedTodo, setEditedTodo] = useState<Todo | null>(null); // Hold edited data
+const TodoTable = ({ todos, performFetch }: TodoTableProps) => {
+
+  const [editingTodo, setEditingTodo] = useState<string | null>(null); 
+  const [editedTodo, setEditedTodo] = useState<Todo | null>(null); 
 
   const handleCheckboxChange = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:9090/todos/${id}`, {
+      const response = await fetch(`http://localhost:9090/todos/${id}/doneStatus`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -26,7 +29,7 @@ const TodoTable = ({ todos }: TodoTableProps) => {
       });
 
       if (response.ok) {
-        console.log('Todo status updated');
+        performFetch();
       } else {
         console.error('Failed to update todo status');
       }
@@ -36,30 +39,41 @@ const TodoTable = ({ todos }: TodoTableProps) => {
   };
 
   const handleEditClick = (todo: Todo) => {
-    setEditingTodo(todo.id); 
-    setEditedTodo({ ...todo }); 
+    setEditingTodo(todo.id);
+    setEditedTodo({ 
+      ...todo, 
+      dueDate: dayjs(todo.dueDate).format('YYYY-MM-DD') 
+    });
   };
 
   const handleCancelEdit = () => {
-    setEditingTodo(null); // Cancel editing and reset state
+
+    setEditingTodo(null); 
     setEditedTodo(null);
+
   };
 
   const handleSaveEdit = async () => {
     if (editedTodo) {
+
+       const formattedDueDate = dayjs(editedTodo.dueDate).format('YYYY-MM-DD[T]HH:mm:ss');
+
+      const updatedTodo = { ...editedTodo, dueDate: formattedDueDate };
+
       try {
-        const response = await fetch(`http://localhost:9090/todos/${editedTodo.id}`, {
+        const response = await fetch(`http://localhost:9090/todos/${updatedTodo.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(editedTodo), // Send the updated todo
+          body: JSON.stringify(updatedTodo), 
         });
 
         if (response.ok) {
           console.log('Todo updated successfully');
-          setEditingTodo(null); // Exit editing mode
+          setEditingTodo(null); 
           setEditedTodo(null);
+          performFetch();
         } else {
           console.error('Failed to save todo');
         }
@@ -115,7 +129,7 @@ const TodoTable = ({ todos }: TodoTableProps) => {
                   />
                 </td>
 
-                {/* Editable Name */}
+
                 <td className="px-6 py-4 whitespace-nowrap">
                   {editingTodo === todo.id ? (
                     <input
@@ -130,7 +144,7 @@ const TodoTable = ({ todos }: TodoTableProps) => {
                   )}
                 </td>
 
-                {/* Editable Priority */}
+
                 <td className="px-6 py-4 whitespace-nowrap">
                   {editingTodo === todo.id ? (
                     <select
@@ -150,22 +164,20 @@ const TodoTable = ({ todos }: TodoTableProps) => {
                   )}
                 </td>
 
-                {/* Editable Due Date */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {editingTodo === todo.id ? (
-                    <input
-                      type="date"
-                      name="dueDate"
-                      value={editedTodo?.dueDate || ''}
-                      onChange={handleChange}
-                      className="border border-gray-300 rounded px-2 py-1"
-                    />
-                  ) : (
-                    todo.dueDate
-                  )}
-                </td>
+                    {editingTodo === todo.id ? (
+                      <input
+                        type="date"
+                        name="dueDate"
+                        value={editedTodo?.dueDate || ''}
+                        onChange={handleChange}
+                        className="border border-gray-300 rounded px-2 py-1"
+                      />
+                    ) : (
+                      todo.dueDate ? dayjs(todo.dueDate).format('DD/MM/YYYY') : ''
+                    )}
+                  </td>
 
-                {/* Actions */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   {editingTodo === todo.id ? (
                     <>
