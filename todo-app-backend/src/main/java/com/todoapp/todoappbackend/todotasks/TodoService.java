@@ -25,11 +25,17 @@ public class TodoService {
         List<TodoTask> todos =  Alltodos.stream()
                 .filter(todo -> priority == null || priority.equalsIgnoreCase("All") || todo.getPriority().equals(priority))
                 .filter(todo -> doneStatus.equalsIgnoreCase("All")||
-                        todo.getDoneStatus() == (doneStatus.equals("Done")) || todo.getDoneStatus() == (doneStatus.equals("Undone"))  )
+                        todo.getDoneStatus().equals(doneStatus))
                 .filter(todo -> name == null || name.isEmpty() ||
                         todo.getName().toLowerCase().contains(name.toLowerCase()))
                 .toList();
 
+
+        return todos;
+
+    }
+
+    public List<TodoTask> paginateResponse(List<TodoTask> todos, int page){
 
         int startIndex = (page - 1) * TODO_PAGE_SIZE;
 
@@ -40,16 +46,23 @@ public class TodoService {
         }
 
         return todos.subList(startIndex, endIndex);
+    }
+
+    public int getTodoListCount(){
+
+        return todoRepository.getAllTodos().size();
 
     }
-    public void createTodoTask(String name, String priority, LocalDateTime dueDate, Boolean isDone){
-        TodoTask newTodo = new TodoTask(name, priority, dueDate, isDone);
+
+
+    public void createTodoTask(String name, String priority, LocalDateTime dueDate){
+        TodoTask newTodo = new TodoTask(name, priority, dueDate);
         todoRepository.createTodo(newTodo);
 
     }
 
-    public void updateTodoTaskStatus(String id, Boolean isDone){
-        todoRepository.updateTodo(id, isDone);
+    public void updateTodoTaskStatus(String id){
+        todoRepository.updateTodoTask(id);
 
     }
 
@@ -116,8 +129,8 @@ public class TodoService {
     }
 
     private String convertSecondsToMinutesAndSeconds(int totalSeconds) {
-        int minutes = totalSeconds / 60;  // Get the number of minutes
-        int seconds = totalSeconds % 60;  // Get the remaining seconds
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
 
         return String.format("%d:%02d", minutes, seconds);
     }

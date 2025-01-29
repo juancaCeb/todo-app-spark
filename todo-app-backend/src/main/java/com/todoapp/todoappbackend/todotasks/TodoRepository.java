@@ -7,7 +7,8 @@ public interface TodoRepository {
 
     List<TodoTask> getAllTodos();
     void createTodo(TodoTask newTodo);
-    void updateTodo(String id, Boolean isDone);
+    TodoTask searchTodoTaskById(String id);
+    void updateTodoTask(String id);
 
 
 }

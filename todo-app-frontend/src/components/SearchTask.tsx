@@ -1,13 +1,5 @@
 import { useState } from "react";
 
-interface todo {
-  id: number;
-  name: string;
-  priority: string;
-  dueDate: string;
-  doneStatus: string;
-}
-
 interface SearchTaskProps {
   filterFunc: (name: string, priority: string, status: string) => void;
 }
@@ -18,7 +10,6 @@ function SearchTask({ filterFunc }: SearchTaskProps) {
   const [status, setStatus] = useState<string>('All');
 
   const handleSearch = () => {
-    console.log(name, priority, status);
     filterFunc(name, priority, status);
   };
 
@@ -26,6 +17,7 @@ function SearchTask({ filterFunc }: SearchTaskProps) {
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="w-full bg-white rounded-lg shadow-md p-6">
         <div className="space-y-4">
+
           <div>
             <label className="block mb-1 text-gray-700">Name</label>
             <input
