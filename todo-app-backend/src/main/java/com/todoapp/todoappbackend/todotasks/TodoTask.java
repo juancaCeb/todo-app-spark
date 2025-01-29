@@ -11,13 +11,13 @@ public class TodoTask {
     private LocalDateTime creationDate;
     private LocalDateTime dueDate;
     private String name;
-    private Boolean isDone;
+    private String doneStatus;
     private LocalDateTime doneDate;
 
-    public TodoTask(String name, String priority, LocalDateTime dueDate, Boolean isDone){
+    public TodoTask(String name, String priority, LocalDateTime dueDate){
         this.priority = priority;
         this.dueDate = dueDate;
-        this.isDone = isDone;
+        this.doneStatus = "Undone";
         this.name = name;
         this.creationDate = LocalDateTime.now();
     }
@@ -59,12 +59,16 @@ public class TodoTask {
     }
 
 
-    public void setDoneStatus(Boolean isDone) {
-        this.isDone = isDone;
+    public void changeDoneStatus() {
+        if(this.doneStatus.equals("Undone")){
+            this.doneStatus = "Done";
+        }else{
+            this.doneStatus = "Undone";
+        }
     }
 
-    public Boolean getDoneStatus() {
-        return this.isDone;
+    public String getDoneStatus() {
+        return this.doneStatus;
     }
 
     public void setDoneDate(LocalDateTime date){

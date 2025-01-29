@@ -2,13 +2,13 @@ import React, { useState } from "react";
 
 interface CreateToDoPopupProps {
   toggleModal: () => void;
+  performFetch: () => void;
 }
 
-function CreateToDoPopup({ toggleModal }: CreateToDoPopupProps) {
+function CreateToDoPopup({ toggleModal, performFetch }: CreateToDoPopupProps) {
 
   const [name, setName] = useState<string>('');
   const [priority, setPriority] = useState<string>('High'); 
-  const [isDone, setIsDone] = useState<string>('Undone'); 
   const [dueDate, setDueDate] = useState<string>(''); 
 
   const BASE_URL = "http://localhost:9090/todos";
@@ -17,27 +17,30 @@ function CreateToDoPopup({ toggleModal }: CreateToDoPopupProps) {
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault(); 
   
-    // Convert dueDate into the proper LocalDateTime format for the backend (e.g., "YYYY-MM-DDT00:00:00")
     const formattedDueDate = dueDate ? `${dueDate}T00:00:00` : null;
   
     const todo = {
       name,  
       priority,    
-      isDone: isDone === 'Done',  
-      dueDate: formattedDueDate,  // Send the formatted dueDate
+      dueDate: formattedDueDate,  
     };
   
     console.log(todo);
   
-    fetch(BASE_URL, {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(todo)
-    }).then(() => {
-      console.log('new todo added');
-    });
+    try {
+      await fetch(BASE_URL, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(todo)
+      });
   
-    toggleModal();
+      console.log('New todo added');
+      performFetch(); 
+  
+      toggleModal(); 
+    } catch (error) {
+      console.error('Error creating todo:', error);
+    }
   };
   
 
@@ -71,17 +74,6 @@ function CreateToDoPopup({ toggleModal }: CreateToDoPopupProps) {
               <option value="High">High</option>
               <option value="Medium">Medium</option>
               <option value="Low">Low</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block mb-1 text-gray-700">State</label>
-            <select
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              onChange={(e) => setIsDone(e.target.value)}
-            >
-              <option value="Done">Done</option>
-              <option value="Undone">Undone</option>
             </select>
           </div>
 

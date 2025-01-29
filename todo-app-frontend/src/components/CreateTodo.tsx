@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import CreateToDoPopup from "./CreateToDoPopup";
 
-export default function CreateTodo() {
+interface CreateToDoPopupProps {
+  performFetch: () => void;
+}
+
+export default function CreateTodo({performFetch} :CreateToDoPopupProps) {
   const [modal, setModal] = useState(false);
 
   const toggleModal = () => {
@@ -23,7 +27,7 @@ export default function CreateTodo() {
         + New To Do
       </button>
 
-      {modal && <CreateToDoPopup toggleModal={toggleModal} />}
+      {modal && <CreateToDoPopup performFetch = {performFetch} toggleModal={toggleModal} />}
     </div>
   );
 }
