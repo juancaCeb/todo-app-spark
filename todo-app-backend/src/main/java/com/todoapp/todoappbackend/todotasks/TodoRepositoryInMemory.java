@@ -35,4 +35,14 @@ public class TodoRepositoryInMemory implements TodoRepository{
 
     }
 
+    public void deleteTodoTask(String id) {
+        TodoTask todoTask = searchTodoTaskById(id);
+
+        if (todoTask != null) {
+            todos.remove(todoTask);
+        } else {
+            System.out.println("Todo with id " + id + " not found.");
+        }
+
+    }
 }

@@ -59,7 +59,7 @@ function TasksPage() {
     <div>
       <SearchTask filterFunc={applyFilter} />
       <CreateTodo performFetch={performFetch} />
-      <TodoTable todos={todos} performFetch={performFetch} />
+      <TodoTable todos={todos} performFetch={performFetch} currPage={currPage} numOfTotalPages={numOfTotalPages}/>
       <Pagination currPage={currPage} setCurrPage={setCurrPage} totalPages={numOfTotalPages} />
     </div>
   );

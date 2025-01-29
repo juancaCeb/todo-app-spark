@@ -9,6 +9,7 @@ public interface TodoRepository {
     void createTodo(TodoTask newTodo);
     TodoTask searchTodoTaskById(String id);
     void updateTodoTask(String id);
+    void deleteTodoTask(String id);
 
 
 }

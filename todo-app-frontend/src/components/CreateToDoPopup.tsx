@@ -25,8 +25,6 @@ function CreateToDoPopup({ toggleModal, performFetch }: CreateToDoPopupProps) {
       dueDate: formattedDueDate,  
     };
   
-    console.log(todo);
-  
     try {
       await fetch(BASE_URL, {
         method: 'POST',

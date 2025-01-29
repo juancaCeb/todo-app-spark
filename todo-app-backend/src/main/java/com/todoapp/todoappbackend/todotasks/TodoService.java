@@ -146,6 +146,11 @@ public class TodoService {
         return String.format("%d:%02d", minutes, seconds);
     }
 
+    public void deleteTodoTask(String id){
+        todoRepository.deleteTodoTask(id);
+
+    }
+
 
 
 }

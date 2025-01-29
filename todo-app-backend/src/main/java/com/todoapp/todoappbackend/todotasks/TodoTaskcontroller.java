@@ -62,6 +62,12 @@ public class TodoTaskcontroller {
 
     }
 
+    @DeleteMapping("todos/{id}")
+    public void deleteTodoTask(@PathVariable String id){
+        todoService.deleteTodoTask(id);
+
+    }
+
 
 
 

@@ -12,12 +12,25 @@ interface Todo {
 interface TodoTableProps {
   todos: Todo[];
   performFetch: () => void;
+  currPage:number;
+  numOfTotalPages:number;
 }
 
-const TodoTable = ({ todos, performFetch }: TodoTableProps) => {
+const TodoTable = ({ todos, performFetch, currPage, numOfTotalPages }: TodoTableProps) => {
 
-  const [editingTodo, setEditingTodo] = useState<string | null>(null); 
-  const [editedTodo, setEditedTodo] = useState<Todo | null>(null); 
+  const [editingTodo, setEditingTodo] = useState<string | null>(null);
+  const [editedTodo, setEditedTodo] = useState<Todo | null>(null);
+  const [isAllChecked, setIsAllChecked] = useState<boolean[]>(new Array(numOfTotalPages).fill(false));
+  const [prioritySort, setPrioritySort] = useState<string>('');
+  
+
+  const sortedTodos = [...todos].sort((a, b) => {
+    if (prioritySort === '') return 0; 
+    const priorities = ['Low', 'Medium', 'High'];
+    const indexA = priorities.indexOf(a.priority);
+    const indexB = priorities.indexOf(b.priority);
+    return indexA - indexB;
+  });
 
   const handleCheckboxChange = async (id: string) => {
     try {
@@ -38,6 +51,11 @@ const TodoTable = ({ todos, performFetch }: TodoTableProps) => {
     }
   };
 
+  const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPrioritySort(e.target.value); 
+  };
+  
+
   const handleEditClick = (todo: Todo) => {
     setEditingTodo(todo.id);
     setEditedTodo({ 
@@ -47,17 +65,14 @@ const TodoTable = ({ todos, performFetch }: TodoTableProps) => {
   };
 
   const handleCancelEdit = () => {
-
     setEditingTodo(null); 
     setEditedTodo(null);
-
   };
 
   const handleSaveEdit = async () => {
+
     if (editedTodo) {
-
-       const formattedDueDate = dayjs(editedTodo.dueDate).format('YYYY-MM-DD[T]HH:mm:ss');
-
+      const formattedDueDate = dayjs(editedTodo.dueDate).format('YYYY-MM-DD[T]HH:mm:ss');
       const updatedTodo = { ...editedTodo, dueDate: formattedDueDate };
 
       try {
@@ -92,6 +107,46 @@ const TodoTable = ({ todos, performFetch }: TodoTableProps) => {
     }
   };
 
+  const handleDelete = async (id: string) => {
+
+    try {
+      const response = await fetch(`http://localhost:9090/todos/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        console.log('Todo deleted successfully');
+        performFetch();
+      } else {
+        console.error('Failed to delete todo');
+      }
+    } catch (error) {
+      console.error('Error deleting todo:', error);
+    }
+
+  };
+
+  const handleSelectAllChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    const checked = e.target.checked;
+  
+    const updatedIsAllChecked = [...isAllChecked];
+  
+    updatedIsAllChecked[currPage] = checked;
+  
+    setIsAllChecked(updatedIsAllChecked);
+  
+    todos.forEach((todo) => {
+      if (convertToBoolean(todo.doneStatus) !== checked) {
+        handleCheckboxChange(todo.id);
+      }
+    });
+
+  };
+
   const convertToBoolean = (doneStatus: string) => doneStatus === 'Done';
 
   return (
@@ -100,15 +155,30 @@ const TodoTable = ({ todos, performFetch }: TodoTableProps) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="w-12 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Done
+            <th className="w-12 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <input
+                  type="checkbox"
+                  checked={isAllChecked[currPage]}
+                  onChange={handleSelectAllChange}
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Priority
-              </th>
+                  Priority
+                  <select
+                    value={prioritySort}
+                    onChange={handlePriorityChange} 
+                    className="ml-2 border border-gray-300 rounded px-2 py-1"
+                  >
+                    <option value="">All</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Due Date
               </th>
@@ -129,7 +199,6 @@ const TodoTable = ({ todos, performFetch }: TodoTableProps) => {
                   />
                 </td>
 
-
                 <td className="px-6 py-4 whitespace-nowrap">
                   {editingTodo === todo.id ? (
                     <input
@@ -143,7 +212,6 @@ const TodoTable = ({ todos, performFetch }: TodoTableProps) => {
                     <span className="text-gray-900">{todo.name}</span>
                   )}
                 </td>
-
 
                 <td className="px-6 py-4 whitespace-nowrap">
                   {editingTodo === todo.id ? (
@@ -165,18 +233,18 @@ const TodoTable = ({ todos, performFetch }: TodoTableProps) => {
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {editingTodo === todo.id ? (
-                      <input
-                        type="date"
-                        name="dueDate"
-                        value={editedTodo?.dueDate || ''}
-                        onChange={handleChange}
-                        className="border border-gray-300 rounded px-2 py-1"
-                      />
-                    ) : (
-                      todo.dueDate ? dayjs(todo.dueDate).format('DD/MM/YYYY') : ''
-                    )}
-                  </td>
+                  {editingTodo === todo.id ? (
+                    <input
+                      type="date"
+                      name="dueDate"
+                      value={editedTodo?.dueDate || ''}
+                      onChange={handleChange}
+                      className="border border-gray-300 rounded px-2 py-1"
+                    />
+                  ) : (
+                    todo.dueDate ? dayjs(todo.dueDate).format('DD/MM/YYYY') : ''
+                  )}
+                </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   {editingTodo === todo.id ? (
@@ -195,12 +263,20 @@ const TodoTable = ({ todos, performFetch }: TodoTableProps) => {
                       </button>
                     </>
                   ) : (
-                    <button
-                      onClick={() => handleEditClick(todo)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
-                    >
-                      Edit
-                    </button>
+                    <>
+                      <button
+                        onClick={() => handleEditClick(todo)}
+                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(todo.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    </>
                   )}
                 </td>
               </tr>
