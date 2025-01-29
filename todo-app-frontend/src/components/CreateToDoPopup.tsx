@@ -6,7 +6,7 @@ interface CreateToDoPopupProps {
 
 function CreateToDoPopup({ toggleModal }: CreateToDoPopupProps) {
 
-  const [description, setName] = useState<string>('');
+  const [name, setName] = useState<string>('');
   const [priority, setPriority] = useState<string>('High'); 
   const [isDone, setIsDone] = useState<string>('Undone'); 
   const [dueDate, setDueDate] = useState<string>(''); 
@@ -16,31 +16,30 @@ function CreateToDoPopup({ toggleModal }: CreateToDoPopupProps) {
 
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault(); 
-
+  
+    // Convert dueDate into the proper LocalDateTime format for the backend (e.g., "YYYY-MM-DDT00:00:00")
+    const formattedDueDate = dueDate ? `${dueDate}T00:00:00` : null;
+  
     const todo = {
-      description,  
+      name,  
       priority,    
       isDone: isDone === 'Done',  
-      dueDate: dueDate || null,  
+      dueDate: formattedDueDate,  // Send the formatted dueDate
     };
-    
-
-    console.log(todo);
-
-    fetch(BASE_URL,{
-
-      method: 'POST',
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(todo)
-    }).then(() =>{
-
-      console.log('new todo added');
-    }
   
-  )
+    console.log(todo);
+  
+    fetch(BASE_URL, {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(todo)
+    }).then(() => {
+      console.log('new todo added');
+    });
+  
     toggleModal();
-    
   };
+  
 
   const handleCancel = () => {
     toggleModal();
@@ -57,7 +56,7 @@ function CreateToDoPopup({ toggleModal }: CreateToDoPopupProps) {
               type="text"
               required
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              value={description}
+              value={name}
               onChange={(e) => setName(e.target.value)}  
             />
           </div>

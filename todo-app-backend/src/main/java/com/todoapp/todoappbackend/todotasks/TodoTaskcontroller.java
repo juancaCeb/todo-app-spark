@@ -21,18 +21,19 @@ public class TodoTaskcontroller {
 
     @GetMapping("/todos")
     public List<TodoTask> getTodoTasks(@RequestParam(required = false) String priority,
-                                       @RequestParam(required = false)Boolean doneStatus,
-                                       @RequestParam(required = false)String name
-                                     //   ,@RequestParam(required = true)int page
-                                        )
+                                       @RequestParam(required = false) String doneStatus,
+                                       @RequestParam(required = false)String name,
+                                       @RequestParam(required = true)int page)
     {
-        return todoService.getTasks(priority, doneStatus, name);
+
+        return todoService.getTasks(priority, doneStatus, name, page);
+
 
     }
 
     @PostMapping("/todos")
     public void createTodoTask(@RequestBody TodoTask todo) {
-        todoService.createTodoTask(todo.getDescription(), todo.getPriority(), todo.getDueDate(), todo.getDoneStatus());
+        todoService.createTodoTask(todo.getName(), todo.getPriority(), todo.getDueDate(), todo.getDoneStatus());
     }
 
     @PutMapping("/todos/{id}")
@@ -41,6 +42,12 @@ public class TodoTaskcontroller {
 
     }
 
+    @GetMapping("/todos/metrics")
+    public TodoMetric getMetrics(){
+
+        return todoService.calculateAppMetrics();
+
+    }
 
 
 

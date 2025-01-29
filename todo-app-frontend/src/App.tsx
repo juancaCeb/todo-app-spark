@@ -8,8 +8,7 @@ function App(){
   return <div>
   
     <TasksPage></TasksPage>
-    <CreateTodo></CreateTodo>
-    <Pagination></Pagination>
+    
     <TaskTimeStats></TaskTimeStats>
 
   </div>;
