@@ -1,14 +1,13 @@
-package com.todoapp.todoappbackend.todotasks;
+package com.todoapp.todoappbackend.todotasks.Repository;
 
+import com.todoapp.todoappbackend.todotasks.Entities.TodoTask;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
-public class TodoRepositoryInMemory implements TodoRepository{
+public class TodoRepositoryInMemory implements TodoRepository {
 
     private List<TodoTask> todos = new ArrayList<>();
 
@@ -19,12 +18,6 @@ public class TodoRepositoryInMemory implements TodoRepository{
 
     public List<TodoTask> getAllTodos(){
         return todos;
-
-    }
-
-    public void updateTodoTask(String id){
-        TodoTask todoTask = searchTodoTaskById(id);
-        todoTask.changeDoneStatus();
 
     }
 

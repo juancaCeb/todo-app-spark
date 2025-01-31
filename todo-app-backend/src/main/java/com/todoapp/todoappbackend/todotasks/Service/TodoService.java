@@ -1,13 +1,14 @@
-package com.todoapp.todoappbackend.todotasks;
+package com.todoapp.todoappbackend.todotasks.Service;
 
+import com.todoapp.todoappbackend.todotasks.Entities.TodoMetric;
+import com.todoapp.todoappbackend.todotasks.Entities.TodoTask;
+import com.todoapp.todoappbackend.todotasks.Repository.TodoRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class TodoService {
@@ -73,14 +74,20 @@ public class TodoService {
     }
 
     public void updateTodoTaskStatus(String id){
-        todoRepository.updateTodoTask(id);
+        TodoTask todo = todoRepository.searchTodoTaskById(id);
+        todo.changeDoneStatus();
+
+        if(todo.getDoneStatus().equals("Done") ){
+            todo.setDoneDate(LocalDateTime.now());
+        }else{
+            todo.setDoneDate(null);
+        }
 
     }
 
     public TodoMetric calculateAppMetrics(){
 
         List<TodoTask> todos = todoRepository.getAllTodos();
-
 
         List<TodoTask> highPriorityTodos = new ArrayList<>();
 
@@ -111,9 +118,7 @@ public class TodoService {
         String mediumPriorityMetric = calculateAverageTime(mediumPriorityTodos);
         String lowPriorityMetric = calculateAverageTime(lowPriorityTodos);
 
-        TodoMetric metrics = new TodoMetric(totalAverageMetric, highPriorityMetric, mediumPriorityMetric, lowPriorityMetric);
-
-        return metrics;
+        return new TodoMetric(totalAverageMetric, highPriorityMetric, mediumPriorityMetric, lowPriorityMetric);
     }
 
     private String calculateAverageTime(List<TodoTask> todos){
@@ -125,7 +130,7 @@ public class TodoService {
             if(todo.getDoneDate() == null){
                 totalSeconds += (int) ChronoUnit.SECONDS.between(todo.getCreationDate(), LocalDateTime.now());
             }else{
-                totalSeconds += (int) ChronoUnit.SECONDS.between(todo.getCreationDate(), LocalDateTime.now());
+                totalSeconds += (int) ChronoUnit.SECONDS.between(todo.getCreationDate(), todo.getDoneDate());
 
             }
 

@@ -1,15 +1,17 @@
-package com.todoapp.todoappbackend.todotasks;
+package com.todoapp.todoappbackend.todotasks.Repository;
 
-import java.util.Date;
+import com.todoapp.todoappbackend.todotasks.Entities.TodoTask;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
+
+@Repository
 public interface TodoRepository {
 
     List<TodoTask> getAllTodos();
     void createTodo(TodoTask newTodo);
     TodoTask searchTodoTaskById(String id);
-    void updateTodoTask(String id);
     void deleteTodoTask(String id);
-
 
 }

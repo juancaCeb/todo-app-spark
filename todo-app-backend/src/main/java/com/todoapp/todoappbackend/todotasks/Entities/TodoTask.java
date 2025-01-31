@@ -1,12 +1,11 @@
-package com.todoapp.todoappbackend.todotasks;
+package com.todoapp.todoappbackend.todotasks.Entities;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 public class TodoTask {
 
-    private final String id = UUID.randomUUID().toString();
+    private final String id;
     private String priority;
     private LocalDateTime creationDate;
     private LocalDateTime dueDate;
@@ -20,6 +19,7 @@ public class TodoTask {
         this.doneStatus = "Undone";
         this.name = name;
         this.creationDate = LocalDateTime.now();
+        this.id = UUID.randomUUID().toString();
     }
 
     public String getId() {
