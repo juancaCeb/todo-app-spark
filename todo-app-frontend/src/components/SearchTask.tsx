@@ -14,27 +14,28 @@ function SearchTask({ filterFunc }: SearchTaskProps) {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <div className="w-full bg-white rounded-lg shadow-md p-6">
+    <div className="container mx-auto p-8 max-w-4xl shadow-lg rounded-lg bg-white border border-gray-200 flex flex-col">
+      <div className="w-full bg-white p-6 flex-grow">
         <div className="space-y-4">
 
           <div>
-            <label className="block mb-1 text-gray-700">Name</label>
+            <label className="font-bold block mb-1 text-gray-700 text-xl">Name</label>
             <input
               type="text"
               id="nombre"
               placeholder="Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-11/12 p-2 border rounded-md mx-auto block"
+              className="w-full p-2 border rounded-md block"
             />
           </div>
-          <div>
-            <label className="block mb-1 text-gray-700">Priority</label>
+
+          <div className="w-6/12">
+            <label className="font-bold block mb-1 text-gray-700 text-xl">Priority</label>
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value)}
-              className="w-11/12 p-2 border rounded-md mx-auto block"
+              className="w-full p-2 border rounded-md block"
             >
               <option value="All">All</option>
               <option value="High">High</option>
@@ -42,24 +43,31 @@ function SearchTask({ filterFunc }: SearchTaskProps) {
               <option value="Low">Low</option>
             </select>
           </div>
-          <div>
-            <label className="block mb-1 text-gray-700">Status</label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="w-11/12 p-2 border rounded-md mx-auto block"
-            >
-              <option value="All">All</option>
-              <option value="Done">Done</option>
-              <option value="Undone">Undone</option>
-            </select>
+
+          <div className="flex items-center space-x-41">
+            <div className="w-6/12">
+              <label className="font-bold block mb-1 text-gray-700 text-xl">Status</label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="w-full p-2 border rounded-md block"
+              >
+                <option value="All">All</option>
+                <option value="Done">Done</option>
+                <option value="Undone">Undone</option>
+              </select>
+            </div>
+
+            <div className="ml-auto mt-auto">
+              <button
+                onClick={handleSearch}
+                className="px-8 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
+              >
+                Search
+              </button>
+            </div>
           </div>
-          <button
-            onClick={handleSearch}
-            className="w-11/12 px-4 py-2 text-white bg-blue-500 rounded-md mx-auto block hover:bg-blue-600"
-          >
-            Search
-          </button>
+
         </div>
       </div>
     </div>

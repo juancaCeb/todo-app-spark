@@ -1,4 +1,4 @@
-package com.todoapp.todoappbackend.todotasks;
+package com.todoapp.todoappbackend.todotasks.Entities;
 
 public class TodoMetric {
 

@@ -5,7 +5,7 @@ interface CreateToDoPopupProps {
   performFetch: () => void;
 }
 
-export default function CreateTodo({performFetch} :CreateToDoPopupProps) {
+export default function CreateTodo({ performFetch }: CreateToDoPopupProps) {
   const [modal, setModal] = useState(false);
 
   const toggleModal = () => {
@@ -19,15 +19,15 @@ export default function CreateTodo({performFetch} :CreateToDoPopupProps) {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="container mx-auto p-6 max-w-4xl">
       <button
         onClick={toggleModal}
-        className="w-full px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
+        className="px-6 py-2 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
       >
         + New To Do
       </button>
 
-      {modal && <CreateToDoPopup performFetch = {performFetch} toggleModal={toggleModal} />}
+      {modal && <CreateToDoPopup performFetch={performFetch} toggleModal={toggleModal} />}
     </div>
   );
 }

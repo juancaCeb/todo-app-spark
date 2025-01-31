@@ -1,12 +1,12 @@
-package com.todoapp.todoappbackend.todotasks;
+package com.todoapp.todoappbackend.todotasks.Controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
+import com.todoapp.todoappbackend.todotasks.Entities.TodoMetric;
+import com.todoapp.todoappbackend.todotasks.Entities.TodoTask;
+import com.todoapp.todoappbackend.todotasks.Service.TodoService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:8080")
@@ -24,9 +24,9 @@ public class TodoTaskcontroller {
     @CrossOrigin(origins = "http://localhost:8080", exposedHeaders = "tasks-count")
     @GetMapping("/todos")
     public ResponseEntity<List<TodoTask>> getTodoTasks(@RequestParam(required = false) String priority,
-                                                      @RequestParam(required = false) String doneStatus,
-                                                      @RequestParam(required = false)String name,
-                                                      @RequestParam(required = true)int page)
+                                                       @RequestParam(required = false) String doneStatus,
+                                                       @RequestParam(required = false)String name,
+                                                       @RequestParam(required = true)int page)
     {
         List<TodoTask> todos = todoService.getTasks(priority, doneStatus, name, page);
         int taskCount = todos.size();
@@ -45,7 +45,7 @@ public class TodoTaskcontroller {
     }
 
     @PutMapping("/todos/{id}/doneStatus")
-    public void changeTodoTaskStatus(@PathVariable String id){
+    public void changeTodoTaskDoneStatus(@PathVariable String id){
         todoService.updateTodoTaskStatus(id);
 
     }
@@ -67,9 +67,5 @@ public class TodoTaskcontroller {
         todoService.deleteTodoTask(id);
 
     }
-
-
-
-
 
 }

@@ -9,7 +9,7 @@ function TasksPage() {
     id: string;
     name: string;
     priority: string;
-    dueDate: string;
+    dueDate: string | null;
     doneStatus: string;
   }
 
@@ -32,12 +32,11 @@ function TasksPage() {
 
   const performFetch = () => {
     const url = `${BASE_URL}?priority=${priority}&page=${currPage}&name=${name}&doneStatus=${status}`;
-  
+
     fetch(url)
       .then((response) => {
         const totalItems = response.headers.get("Tasks-Count");
         const totalItemsCount = totalItems ? parseInt(totalItems, 10) : 0;
-        console.log(totalItemsCount);
         const totalPages = Math.ceil(totalItemsCount / 10);
 
         return response.json().then((data: todo[]) => {
@@ -49,17 +48,17 @@ function TasksPage() {
         console.error('Error fetching todos:', error);
       });
   };
-  
 
   useEffect(() => {
     performFetch();
-  }, [currPage, name, priority, status]); 
+  }, [currPage, name, priority, status]);
 
   return (
-    <div>
+    <div className="container mx-auto pt-4 px-14 pb-6 space-y-6 shadow-sm">
+
       <SearchTask filterFunc={applyFilter} />
       <CreateTodo performFetch={performFetch} />
-      <TodoTable todos={todos} performFetch={performFetch} currPage={currPage} numOfTotalPages={numOfTotalPages}/>
+      <TodoTable todos={todos} performFetch={performFetch} currPage={currPage} numOfTotalPages={numOfTotalPages} setTodos={setTodos} />
       <Pagination currPage={currPage} setCurrPage={setCurrPage} totalPages={numOfTotalPages} />
     </div>
   );
