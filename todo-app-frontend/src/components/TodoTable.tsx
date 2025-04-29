@@ -223,6 +223,7 @@ const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }:
       if (response.ok) {
         toast.success('Successfully Deleted')
 
+
         performFetch();
         
       } else {
@@ -263,11 +264,11 @@ const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }:
     const twoWeeksFromNow = now.add(2, 'week');
 
     if (dueDateMoment.isBefore(oneWeekFromNow) && dueDateMoment.isAfter(now)) {
-      return 'bg-red-100'; // Red background for tasks within 1 week
+      return 'bg-red-100'; 
     } else if (dueDateMoment.isBefore(twoWeeksFromNow) && dueDateMoment.isAfter(now)) {
-      return 'bg-yellow-100'; // Yellow background for tasks within 2 weeks
+      return 'bg-yellow-100'; 
     } else if (dueDateMoment.isAfter(twoWeeksFromNow)) {
-      return 'bg-green-100'; // Green background for tasks more than 2 weeks away
+      return 'bg-green-100'; 
     }
     return '';
   };
@@ -377,6 +378,7 @@ const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }:
                       value={editedTodo?.dueDate || ""}
                       onChange={handleChange}
                       className="border border-gray-300 rounded px-2 py-1"
+                      min={dayjs().format("YYYY-MM-DD")}
                     />
                   ) : (
                     todo.dueDate ? dayjs(todo.dueDate).format('DD/MM/YYYY') : ""

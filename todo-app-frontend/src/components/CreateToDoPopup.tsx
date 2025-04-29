@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import React, { useState } from "react";
 
 interface CreateToDoPopupProps {
@@ -80,6 +81,7 @@ function CreateToDoPopup({ toggleModal, performFetch }: CreateToDoPopupProps) {
             <input
               type="date"
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              min={dayjs().format("YYYY-MM-DD")}
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
             />
