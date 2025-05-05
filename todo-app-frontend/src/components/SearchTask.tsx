@@ -1,14 +1,55 @@
 import { useState } from "react";
+/**
+   * Callback function to update parent filters
+   * @param name - Text to search in todo names
+   * @param priority - Priority filter value
+   * @param status - Status filter value
+   */
 
 interface SearchTaskProps {
   filterFunc: (name: string, priority: string, status: string) => void;
 }
 
+/**
+ * SearchTask Component
+ * -------------------
+ * A form component that provides filtering capabilities for todo items.
+ * Acts as a controlled component that lifts state up to parent through filterFunc
+ * which then executes the filtering logic.
+ *
+ * @component
+ * @param {SearchTaskProps} props
+ * @returns {JSX.Element} Search form with name, priority and status filters
+ *
+ * Key Features:
+ * - Name text search
+ * - Priority selection (All/High/Medium/Low)
+ * - Status filtering (All/Done/Undone)
+ * - Immediate search execution (no debouncing)
+ */
+
 function SearchTask({ filterFunc }: SearchTaskProps) {
+  
+  /**
+   * Local state management for filters
+   * All states are controlled and synced with form inputs
+   */
   const [name, setName] = useState<string>('');
   const [priority, setPriority] = useState<string>('All');
   const [status, setStatus] = useState<string>('All');
 
+  /**
+   * handleSearch
+   * ------------------------------
+   * Purpose: Triggers parent filter update
+   * Params: None - uses current state values
+   * Returns: void
+   * 
+   * DO NOT:
+   * - Add validation - parent handles it
+   * - Add debouncing - instant update needed
+   * - Modify state here - use setState functions
+   */
   const handleSearch = () => {
     filterFunc(name, priority, status);
   };

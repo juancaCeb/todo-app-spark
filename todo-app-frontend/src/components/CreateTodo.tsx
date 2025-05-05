@@ -1,9 +1,38 @@
 import React, { useState } from "react";
 import CreateToDoPopup from "./CreateToDoPopup";
 
+/**
+ * CreateToDoPopupProps Interface
+ * ------------------------------
+ * Defines the props expected by the CreateToDo component
+ *
+ * @interface
+ * @property {() => void} performFetch - Function to refresh the todo list
+ *
+ * Usage:
+ * <CreateTodo
+ *   performFetch={performFetch}
+ * />
+ */
 interface CreateToDoPopupProps {
   performFetch: () => void;
 }
+
+/**
+ * CreateTodo Component
+ * --------------------
+ * A button that opens a modal for creating new todo items.
+ * The modal contains a form for entering todo details.
+ *
+ * @component
+ * @param {CreateToDoPopupProps} props
+ * @returns {JSX.Element} Rendered button and modal
+ *
+ * Key Features:
+ * - Button to open modal
+ * - Modal contains form for creating new todo items
+ * - Controlled modal state
+ */
 
 export default function CreateTodo({ performFetch }: CreateToDoPopupProps) {
   const [modal, setModal] = useState(false);
@@ -11,6 +40,12 @@ export default function CreateTodo({ performFetch }: CreateToDoPopupProps) {
   const toggleModal = () => {
     setModal(!modal);
   };
+
+  /**   
+   * Effect to manage body class for modal visibility
+   * Adds 'active-modal' class to body when modal is open
+   * Removes class when modal is closed
+   */
 
   if (modal) {
     document.body.classList.add("active-modal");

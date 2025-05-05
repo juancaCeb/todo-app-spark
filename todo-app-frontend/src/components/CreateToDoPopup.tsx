@@ -1,48 +1,128 @@
 import dayjs from "dayjs";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
+import { API_CONFIG } from '../config/api.config'; 
+import { fetchToken } from '../utils/api/authApi'; 
 
+
+  /**
+   * CreateToDoPopupProps Interface
+   * Defines the props expected by the CreateToDoPopup component
+   *
+   * @interface
+   * @property {() => void} toggleModal - Function to close the modal
+   * @property {() => void} performFetch - Function to refresh the todo list
+   *
+   * Usage:
+   * <CreateToDoPopup
+   *   toggleModal={toggleModal}
+   *   performFetch={performFetch}
+   * />
+   */
+  
 interface CreateToDoPopupProps {
   toggleModal: () => void;
   performFetch: () => void;
 }
 
+/**
+ * CreateToDoPopup Component
+ * -------------------------
+ * Modal component for creating new todo items with form validation and API integration.
+ * 
+ * @component
+ * @param {CreateToDoPopupProps} props
+ * @prop {() => void} toggleModal - Function to close the modal
+ * @prop {() => void} performFetch - Function to refresh todo list
+ */
+
 function CreateToDoPopup({ toggleModal, performFetch }: CreateToDoPopupProps) {
+
+  /**
+   * Form State
+   * ---------
+   * name: Required, string input for todo name
+   * priority: Selected from High/Medium/Low, defaults to High
+   * dueDate: Optional date string in YYYY-MM-DD format
+   */
 
   const [name, setName] = useState<string>('');
   const [priority, setPriority] = useState<string>('High'); 
   const [dueDate, setDueDate] = useState<string>(''); 
 
-  const BASE_URL = "http://localhost:9090/todos";
+  /**
+   * Formats a date string to API expected format
+   * @param dateString - Raw date string from input
+   * @returns Formatted date string or null
+   */
+  const formatDueDate = (dateString: string): string | null => {
+    return dateString ? `${dateString}T00:00:00` : null;
+  };
 
+  /**
+   * Creates a new todo item
+   * Requires valid authentication token
+   * Updates parent state on success
+   * Shows toast notifications for feedback
+   * 
+   * Flow:
+   * 1. Prevent default form submission
+   * 2. Get authentication token
+   * 3. Make API request
+   * 4. Handle response/errors
+   * 5. Update UI state
+   * 
+   * @async
+   * @function handleCreate
+   * @param {React.FormEvent} event - Form submission event
+   * @throws {Error} When API request fails
+   */
 
   const handleCreate = async (event: React.FormEvent) => {
-    event.preventDefault(); 
-  
-    const formattedDueDate = dueDate ? `${dueDate}T00:00:00` : null;
-  
-    const todo = {
-      name,  
-      priority,    
-      dueDate: formattedDueDate,  
-    };
-  
+    event.preventDefault();
+
     try {
-      await fetch(BASE_URL, {
-        method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(todo)
+      const token = await fetchToken();
+      
+      if (!token) {
+        toast.error("Authentication token missing");
+        return;
+      }
+
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CREATE}`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name,
+          priority,
+          dueDate: formatDueDate(dueDate)
+        })
       });
-  
-      console.log('New todo added');
-      performFetch(); 
-  
-      toggleModal(); 
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to create todo: ${response.status} ${errorText}`);
+      }
+
+      toast.success("Todo created successfully");
+      performFetch();
+      toggleModal();
+
     } catch (error) {
-      console.error('Error creating todo:', error);
+      console.error("Error creating todo:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to create todo");
     }
   };
   
-
+  /**
+   * Handles modal cancellation
+   * Closes modal without saving
+   * No cleanup needed
+   */
+  
   const handleCancel = () => {
     toggleModal();
   };

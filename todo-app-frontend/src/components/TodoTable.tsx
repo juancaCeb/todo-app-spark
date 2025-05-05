@@ -1,22 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import { ToastContainer, toast } from 'react-toastify';
+import { Todo, TodoTableProps} from '../types/todo.types';
+import { fetchToken } from '../utils/api/authApi';
+import { updateTodo } from '../utils/api/todoApi';
+import { DUE_DATE_COLORS, TIME_PERIODS } from '../types/todo.types';
 
-interface Todo {
-  id: string;
-  name: string;
-  priority: string;
-  dueDate: string | null;  
-  doneStatus: string;
-}
 
-interface TodoTableProps {
-  todos: Todo[];
-  performFetch: () => void;
-  setTodos: (todo:Todo[]) => void;
-  currPage:number;
-  numOfTotalPages:number;
-}
+/**
+ * TodoTable Component
+ * 
+ * A complex data table component that handles todo items with the following features:
+ * - Sortable columns (priority and due date)
+ * - Inline editing
+ * - Batch status updates
+ * - Row-level actions (edit, delete)
+ * - Visual indicators for due dates
+ * - Authentication integration
+ * 
+ * @param {Object} props
+ * @param {Todo[]} props.todos - Array of todo items to display
+ * @param {Function} props.setTodos - Function to update todos state
+ * @param {Function} props.performFetch - Function to refresh data from API
+ * @param {number} props.currPage - Current page number
+ * @param {number} props.numOfTotalPages - Total number of pages
+ */
 
 const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }: TodoTableProps) => {
 
@@ -28,28 +36,33 @@ const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }:
   const [sortedTodos, setSortedTodos] = useState<Todo[]>([]);
   const [finalTodos, setFinalTodos] = useState<Todo[]>([]);
 
+  /**
+   * If soring is needed, set the sortedTodos to the current todos
+   * Else, set the finalTodos to the current todos
+   * This is done to prevent unnecessary sorting on every render
+   * and to optimize performance
+   */
+
   useEffect(() => {
 
     if (needsSorting()){
-
       setSortedTodos(todos);
-
     }else{
-
       setFinalTodos(todos);
-
     }
     
   }, [todos])
 
   useEffect(() => {
-
     setSortedTodos(finalTodos);
-    
   }, [dueDateSort, prioritySort])
 
+  /**
+   * Determines if sorting is needed based on current filters
+   * Used to optimize rendering and prevent unnecessary sorts
+   */
   function needsSorting() : boolean {
-     
+
       if(prioritySort === "All" && dueDateSort === "All"){
           return false;
       }else{
@@ -57,6 +70,12 @@ const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }:
       }
 
   };
+
+  /**
+   * Handles the complete sorting logic
+   * Priority sorting takes precedence over date sorting
+   * Maintains sort order across pagination
+   */
 
   useEffect(() => {
     const priorities = ['Low', 'Medium', 'High'];
@@ -117,34 +136,66 @@ const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }:
   
   }, [sortedTodos]);
 
+  /**
+   * Handles the checkbox change event
+   * Updates the status of the todo item
+   * @param {string} id - The ID of the todo item
+   */
+
   const handleCheckboxChange = async (id: string) => {
     try {
+      const token = await fetchToken();
+      
+      if (!token) {
+        console.error("Token could not be retrieved.");
+        toast.error("Authentication token missing");
+        return;
+      }
+  
       const response = await fetch(`http://localhost:9090/todos/${id}/doneStatus`, {
         method: 'PUT',
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-
+  
       if (response.ok) {
         performFetch();
+        toast.success('Status updated successfully');
       } else {
-        console.error('Failed to update todo status');
+        const errorText = await response.text();
+        throw new Error(`Failed to update todo status: ${response.status} ${errorText}`);
       }
     } catch (error) {
       console.error('Error updating todo status:', error);
+      toast.error('Failed to update todo status');
     }
   };
+  /**
+   * Handles the priority change event
+   * Updates the priority filter
+   * @param {React.ChangeEvent<HTMLSelectElement>} e - The event object
+   */
 
   const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setPrioritySort(e.target.value); 
   };
+  /**
+   * Handles the due date change event
+   * Updates the due date filter
+   * @param {React.ChangeEvent<HTMLSelectElement>} e - The event object
+   */
 
   const handleDueDateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setDueDateSort(e.target.value); 
   };
+  /**
+   * Handles the edit button click event
+   * Sets the editing state and pre-fills the form with current todo data
+   * @param {Todo} todo - The todo item to edit
+   */
   
-
   const handleEditClick = (todo: Todo) => {
     setEditingTodo(todo.id);
   
@@ -153,55 +204,57 @@ const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }:
       dueDate: todo.dueDate !== null ? dayjs(todo.dueDate).format('YYYY-MM-DD') : null
 
     });
-    
 
     
   };
   
-  
-
+  /**
+   * Handles the cancel edit button click event
+   * Resets the editing state
+   */
   const handleCancelEdit = () => {
     setEditingTodo(null); 
     setEditedTodo(null);
   };
-
+  /**
+   * Handles the save edit button click event
+   * Sends the updated todo data to the API
+   * @param {string} id - The ID of the todo item
+   */
   const handleSaveEdit = async () => {
-    if (editedTodo) {
-      let formattedDueDate = null;
+
+    if (!editedTodo) return;
+    try {
+      const token = await fetchToken();
       
-  
-      if (editedTodo.dueDate && editedTodo.dueDate !== '') {
-        formattedDueDate = dayjs(editedTodo.dueDate).format('YYYY-MM-DD[T]HH:mm:ss');
+      if (!token) {
+        console.error("Token could not be retrieved.");
+        toast.error("Authentication token missing");
+        return;
       }
   
-      const updatedTodo = { ...editedTodo, dueDate: formattedDueDate };
-      
+      const result = await updateTodo(editedTodo, token);
   
-      try {
-        const response = await fetch(`http://localhost:9090/todos/${updatedTodo.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedTodo),
-        });
-  
-        if (response.ok) {
-          console.log('Todo updated successfully');
-          setEditingTodo(null);
-          setEditedTodo(null);
-          performFetch();
-          toast.success('Successfully Edited');
-        } else {
-          console.error('Failed to save todo');
-        }
-      } catch (error) {
-        console.error('Error saving todo:', error);
+      if (result.success) {
+        setEditingTodo(null);
+        setEditedTodo(null);
+        performFetch();
+        toast.success('Successfully updated todo');
+      } else {
+        toast.error(result.error || 'Failed to update todo');
       }
+    } catch (error) {
+      console.error('Error updating todo:', error);
+      toast.error('Failed to update todo');
     }
   };
+  /**
+   * Handles the change event for the todo input fields
+   * Updates the editedTodo state with new values
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLSelectElement>} e - The event object
+   */
   
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChangeOnTodo = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     if (editedTodo) {
       setEditedTodo({
         ...editedTodo,
@@ -209,41 +262,54 @@ const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }:
       });
     }
   };
+  /**
+   * Handles the delete button click event
+   * Sends a delete request to the API
+   * @param {string} id - The ID of the todo item
+   */
 
   const handleDelete = async (id: string) => {
-
     try {
+
+      const token = await fetchToken();
+      
+      if (!token) {
+        console.error("Token could not be retrieved.");
+        toast.error("Authentication token missing");
+        return;
+      }
+  
       const response = await fetch(`http://localhost:9090/todos/${id}`, {
         method: 'DELETE',
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-
+  
       if (response.ok) {
-        toast.success('Successfully Deleted')
-
-
+        toast.success('Successfully Deleted');
         performFetch();
-        
       } else {
-        console.error('Failed to delete todo');
-        toast.error('Failed To Delete')
+        const errorText = await response.text();
+        throw new Error(`Failed to delete todo: ${response.status} ${errorText}`);
       }
     } catch (error) {
       console.error('Error deleting todo:', error);
+      toast.error('Failed to delete todo');
     }
-
   };
+  /**
+   * Handles the select all checkboxes event
+   * Updates the status of all todos on the current page
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The event object
+   */
 
-  const handleSelectAllChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectAllCheckboxes = (e: React.ChangeEvent<HTMLInputElement>) => {
 
     const checked = e.target.checked;
-  
     const updatedIsAllChecked = [...isAllChecked];
-  
     updatedIsAllChecked[currPage] = checked;
-  
     setIsAllChecked(updatedIsAllChecked);
   
     todos.forEach((todo) => {
@@ -256,29 +322,49 @@ const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }:
 
   const convertToBoolean = (doneStatus: string) => doneStatus === 'Done';
 
+  /**
+   * Determines the background color for the due date cell
+   * based on the current date and the due date of the todo item
+   * @param {string | null} dueDate - The due date of the todo item
+   * @returns {string} - The background color class
+   */
+
   const getDueDateBackgroundColor = (dueDate: string | null): string => {
-    if (!dueDate) return '';
+    if (!dueDate) return DUE_DATE_COLORS.DEFAULT;
+  
     const dueDateMoment = dayjs(dueDate);
     const now = dayjs();
-    const oneWeekFromNow = now.add(1, 'week');
-    const twoWeeksFromNow = now.add(2, 'week');
-
-    if (dueDateMoment.isBefore(oneWeekFromNow) && dueDateMoment.isAfter(now)) {
-      return 'bg-red-100'; 
-    } else if (dueDateMoment.isBefore(twoWeeksFromNow) && dueDateMoment.isAfter(now)) {
-      return 'bg-yellow-100'; 
-    } else if (dueDateMoment.isAfter(twoWeeksFromNow)) {
-      return 'bg-green-100'; 
+    const oneWeekFromNow = now.add(TIME_PERIODS.ONE_WEEK, 'week');
+    const twoWeeksFromNow = now.add(TIME_PERIODS.TWO_WEEKS, 'week');
+  
+    if (dueDateMoment.isBefore(now)) {
+      return DUE_DATE_COLORS.URGENT; 
     }
-    return '';
+  
+    switch (true) {
+      case dueDateMoment.isBefore(oneWeekFromNow):
+        return DUE_DATE_COLORS.URGENT;
+      case dueDateMoment.isBefore(twoWeeksFromNow):
+        return DUE_DATE_COLORS.WARNING;
+      case dueDateMoment.isAfter(twoWeeksFromNow):
+        return DUE_DATE_COLORS.SAFE;
+      default:
+        return DUE_DATE_COLORS.DEFAULT;
+    }
   };
+
+  /**
+   * Renders the TodoTable component
+   * Displays the todos in a table format with sorting, editing, and deleting functionalities
+   * @returns {JSX.Element}
+   */
 
   return (
     
     <div className="container mx-auto p-6 max-w-4xl">
       <ToastContainer
-  position="bottom-center"
-/>
+        position="bottom-center"
+      />
       
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
@@ -288,7 +374,7 @@ const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }:
                 <input
                   type="checkbox"
                   checked={isAllChecked[currPage]}
-                  onChange={handleSelectAllChange}
+                  onChange={handleSelectAllCheckboxes}
                   className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
               </th>
@@ -343,7 +429,7 @@ const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }:
                       type="text"
                       name="name"
                       value={editedTodo?.name || ''}
-                      onChange={handleChange}
+                      onChange={handleChangeOnTodo}
                       className="border border-gray-300 rounded px-2 py-1"
                     />
                   ) : (
@@ -356,7 +442,7 @@ const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }:
                     <select
                       name="priority"
                       value={editedTodo?.priority || ''}
-                      onChange={handleChange}
+                      onChange={handleChangeOnTodo}
                       className="border border-gray-300 rounded px-2 py-1"
                     >
                       <option value="Low">Low</option>
@@ -376,7 +462,7 @@ const TodoTable = ({ todos, setTodos, performFetch, currPage, numOfTotalPages }:
                       type="date"
                       name="dueDate"
                       value={editedTodo?.dueDate || ""}
-                      onChange={handleChange}
+                      onChange={handleChangeOnTodo}
                       className="border border-gray-300 rounded px-2 py-1"
                       min={dayjs().format("YYYY-MM-DD")}
                     />
